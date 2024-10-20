@@ -1,0 +1,49 @@
+Sub CopierVersFeuille()
+    Dim wsProceeding As Worksheet
+    Dim wsSwissTrade As Worksheet
+    Dim wsNonSwissTrade As Worksheet
+    Dim wsNordicTrade As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim destinationRowSwiss As Long
+    Dim destinationRowNonSwiss As Long
+    Dim destinationRowNordic As Long
+    Dim firstEmptyCellSwiss As Range
+    Dim firstEmptyCellNonSwiss As Range
+    Dim firstEmptyCellNordic As Range
+    
+    Set wsProceeding = ThisWorkbook.Sheets("Proceeding")
+    Set wsSwissTrade = ThisWorkbook.Sheets("SwissTrade")
+    Set wsNonSwissTrade = ThisWorkbook.Sheets("NonSwissTrade")
+    Set wsNordicTrade = ThisWorkbook.Sheets("NordicTrade")
+    
+    lastRow = wsProceeding.Cells(wsProceeding.Rows.Count, "A").End(xlUp).Row
+    Set firstEmptyCellSwiss = wsSwissTrade.Cells(wsSwissTrade.Rows.Count, "B").End(xlUp).Offset(1, 0)
+    Set firstEmptyCellNonSwiss = wsNonSwissTrade.Cells(wsNonSwissTrade.Rows.Count, "B").End(xlUp).Offset(1, 0)
+    Set firstEmptyCellNordic = wsNordicTrade.Cells(wsNordicTrade.Rows.Count, "B").End(xlUp).Offset(1, 0)
+    
+    destinationRowSwiss = firstEmptyCellSwiss.Row
+    destinationRowNonSwiss = firstEmptyCellNonSwiss.Row
+    destinationRowNordic = firstEmptyCellNordic.Row
+    
+    For i = 2 To lastRow + 1
+        If wsProceeding.Cells(i, "A").Value <> "" Then
+            wsSwissTrade.Rows(destinationRowSwiss).Value = wsProceeding.Rows(i).Value
+            wsSwissTrade.Cells(destinationRowSwiss, "S").Value = wsProceeding.Cells(i, "D").Value ' Copier de D vers S
+            wsSwissTrade.Cells(destinationRowSwiss, "D").ClearContents ' Effacer le contenu de la colonne D
+            destinationRowSwiss = destinationRowSwiss + 1
+        Else
+            If Len(wsProceeding.Cells(i, "A").Value) = 0 And (Len(wsProceeding.Cells(i, "L").Value) < 3 Or Right(wsProceeding.Cells(i, "L").Value, 3) <> "KLM") Then
+                wsNonSwissTrade.Rows(destinationRowNonSwiss).Value = wsProceeding.Rows(i).Value
+                wsNonSwissTrade.Cells(destinationRowNonSwiss, "S").Value = wsProceeding.Cells(i, "D").Value ' Copier de D vers S
+                wsNonSwissTrade.Cells(destinationRowNonSwiss, "D").ClearContents ' Effacer le contenu de la colonne D
+                destinationRowNonSwiss = destinationRowNonSwiss + 1
+            Else
+                wsNordicTrade.Rows(destinationRowNordic).Value = wsProceeding.Rows(i).Value
+                wsNordicTrade.Cells(destinationRowNordic, "S").Value = wsProceeding.Cells(i, "D").Value ' Copier de D vers S
+                wsNordicTrade.Cells(destinationRowNordic, "D").ClearContents ' Effacer le contenu de la colonne D
+                destinationRowNordic = destinationRowNordic + 1
+            End If
+        End If
+    Next i
+End Sub
